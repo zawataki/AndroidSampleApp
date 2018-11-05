@@ -18,8 +18,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import org.apache.commons.codec.binary.Hex;
-
 /**
  * @see <a href="https://developer.android.com/reference/android/nfc/package-summary">
  * android.nfc  |  Android Developers</a>
@@ -88,13 +86,16 @@ public class NfcReaderActivity extends AppCompatActivity {
         }
 
         /**
-         * Cannot use {@link Hex#encodeHexString(byte[])} because
-         * {@link NoSuchMethodError} occurs
+         * Cannot use org.apache.commons.codec.binary.Hex#encodeHexString(byte[])
+         * because {@link NoSuchMethodError} occurs
          *
          * @see <a href="https://qiita.com/komitake/items/375863848e2534d29a87">AndroidでApache Commons Codecを使う時の注意点 - Qiita</a>
          */
-        final char[] tagIdHexChars = Hex.encodeHex(tag.getId());
-        final String tagIdStr = new String(tagIdHexChars);
+        final byte[] tagIdBytes = tag.getId();
+        String tagIdStr = "";
+        for (byte b : tagIdBytes) {
+            tagIdStr += String.format("%02X", b);
+        }
 
         TextView textView = findViewById(R.id.textViewNfcId);
 
