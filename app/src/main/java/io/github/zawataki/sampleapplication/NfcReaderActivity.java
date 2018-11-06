@@ -3,6 +3,7 @@ package io.github.zawataki.sampleapplication;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
@@ -15,8 +16,12 @@ import android.nfc.tech.NfcB;
 import android.nfc.tech.NfcF;
 import android.nfc.tech.NfcV;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.TextView;
+
+import trikita.log.Log;
 
 /**
  * @see <a href="https://developer.android.com/reference/android/nfc/package-summary">
@@ -30,6 +35,7 @@ import android.widget.TextView;
  */
 public class NfcReaderActivity extends AppCompatActivity {
 
+    private SharedPreferences preferences;
     private IntentFilter[] intentFilterArray;
     private String[][] techListArray;
     private NfcAdapter nfcAdapter;
@@ -67,6 +73,8 @@ public class NfcReaderActivity extends AppCompatActivity {
         };
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(getApplicationContext());
+
+        preferences = getPreferences(MODE_PRIVATE);
     }
 
     @Override
@@ -97,9 +105,38 @@ public class NfcReaderActivity extends AppCompatActivity {
             tagIdStr += String.format("%02X", b);
         }
 
-        TextView textView = findViewById(R.id.textViewNfcId);
+        setValueToTextView(R.id.textViewNfcId, tagIdStr);
 
-        textView.setText(tagIdStr);
+        final String username = getUsernameByTagId(tagIdStr);
+        if (username == null) {
+            Log.i("New user for tag: " + tagIdStr);
+            final String newUsername = registerUser(tagIdStr);
+            setValueToTextView(R.id.textViewUserSearchResut, "New user");
+            setValueToTextView(R.id.textViewUsername, newUsername);
+        } else {
+            Log.i("User is already registered. username: " + username);
+            setValueToTextView(R.id.textViewUserSearchResut, "Existing user");
+            setValueToTextView(R.id.textViewUsername, username);
+        }
+    }
+
+    private void setValueToTextView(@IdRes int resourceId, String tagId) {
+        TextView textView = findViewById(resourceId);
+        textView.setText(tagId);
+    }
+
+    private String getUsernameByTagId(String tagId) {
+        return preferences.getString(tagId, null);
+    }
+
+    private String registerUser(String tagId) {
+        final String newUsername = "user-" + System.currentTimeMillis();
+        preferences.edit().putString(tagId, newUsername).commit();
+        return newUsername;
+    }
+
+    public void deleteAllUsers(View view) {
+        preferences.edit().clear().commit();
     }
 
     @Override

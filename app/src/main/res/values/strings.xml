@@ -4,4 +4,6 @@
     <string name="button_send">Send</string>
     <string name="button_read_nfc">Read NFC tag</string>
     <string name="title_nfc_reader">NFC Tag ID</string>
+    <string name="title_username">Username</string>
+    <string name="button_delete_all_users">Delete all users</string>
 </resources>
