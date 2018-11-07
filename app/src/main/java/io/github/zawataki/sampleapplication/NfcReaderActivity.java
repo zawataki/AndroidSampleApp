@@ -163,6 +163,10 @@ public class NfcReaderActivity extends AppCompatActivity {
             return;
         }
 
+        InputMethodManager imm =
+                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(findViewById(R.id.editTextUsername).getWindowToken(), 0);
+
         TextView textView = findViewById(R.id.textViewNfcId);
         final String tagId = textView.getText().toString();
         preferences.edit().putString(tagId, newUsername).commit();
