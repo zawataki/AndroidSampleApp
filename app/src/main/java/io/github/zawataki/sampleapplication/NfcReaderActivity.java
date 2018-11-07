@@ -1,9 +1,11 @@
 package io.github.zawataki.sampleapplication;
 
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
@@ -19,7 +21,11 @@ import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
+
+import org.apache.commons.lang3.StringUtils;
 
 import trikita.log.Log;
 
@@ -109,10 +115,16 @@ public class NfcReaderActivity extends AppCompatActivity {
 
         final String username = getUsernameByTagId(tagIdStr);
         if (username == null) {
-            Log.i("New user for tag: " + tagIdStr);
-            final String newUsername = registerUser(tagIdStr);
-            setValueToTextView(R.id.textViewUserSearchResut, "New user");
-            setValueToTextView(R.id.textViewUsername, newUsername);
+            Log.i("User is NOT registered for tag: " + tagIdStr);
+            setValueToTextView(R.id.textViewUserSearchResut,
+                    "You are not registered. Please register");
+            setValueToTextView(R.id.textViewUsername, "");
+            findViewById(R.id.editTextUsername).setVisibility(View.VISIBLE);
+            findViewById(R.id.buttonUserRegistration).setVisibility(View.VISIBLE);
+            InputMethodManager imm =
+                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(findViewById(R.id.editTextUsername),
+                    InputMethodManager.SHOW_IMPLICIT);
         } else {
             Log.i("User is already registered. username: " + username);
             setValueToTextView(R.id.textViewUserSearchResut, "Existing user");
@@ -120,19 +132,46 @@ public class NfcReaderActivity extends AppCompatActivity {
         }
     }
 
-    private void setValueToTextView(@IdRes int resourceId, String tagId) {
+    private void setValueToTextView(@IdRes int resourceId, String value) {
         TextView textView = findViewById(resourceId);
-        textView.setText(tagId);
+        textView.setText(value);
+    }
+
+    private void setValueAndColorToTextView(@IdRes int resourceId, String value, int color) {
+        TextView textView = findViewById(resourceId);
+        textView.setText(value);
+        textView.setTextColor(color);
     }
 
     private String getUsernameByTagId(String tagId) {
         return preferences.getString(tagId, null);
     }
 
-    private String registerUser(String tagId) {
-        final String newUsername = "user-" + System.currentTimeMillis();
+    public void registerUser(View view) {
+        final EditText editTextUsername = findViewById(R.id.editTextUsername);
+        final String newUsername = editTextUsername.getText().toString();
+
+        if (StringUtils.isBlank(newUsername)) {
+            setValueAndColorToTextView(R.id.textViewUserSearchResut,
+                    "Username is blank. Please input valid username", Color.RED);
+            setValueToTextView(R.id.editTextUsername, "");
+
+            InputMethodManager imm =
+                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(findViewById(R.id.editTextUsername),
+                    InputMethodManager.SHOW_IMPLICIT);
+            return;
+        }
+
+        TextView textView = findViewById(R.id.textViewNfcId);
+        final String tagId = textView.getText().toString();
         preferences.edit().putString(tagId, newUsername).commit();
-        return newUsername;
+        setValueToTextView(R.id.editTextUsername, "");
+        findViewById(R.id.editTextUsername).setVisibility(View.INVISIBLE);
+        findViewById(R.id.buttonUserRegistration).setVisibility(View.INVISIBLE);
+        setValueToTextView(R.id.textViewUserSearchResut,
+                "Hi " + newUsername + ",\nThank you for registration");
+        Log.i("User registration is successful. tagId: " + tagId + ". username: " + newUsername);
     }
 
     public void deleteAllUsers(View view) {
