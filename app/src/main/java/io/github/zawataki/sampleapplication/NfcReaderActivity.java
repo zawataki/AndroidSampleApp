@@ -8,6 +8,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
@@ -50,6 +51,7 @@ public class NfcReaderActivity extends AppCompatActivity {
     private String[][] techListArray;
     private NfcAdapter nfcAdapter;
     private PendingIntent pendingIntent;
+    private ColorStateList defaultTextColors;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,12 +143,22 @@ public class NfcReaderActivity extends AppCompatActivity {
     private void setValueToTextView(@IdRes int resourceId, String value) {
         TextView textView = findViewById(resourceId);
         textView.setText(value);
+
+        if (defaultTextColors != null) {
+            textView.setTextColor(defaultTextColors);
+        }
     }
 
     private void setValueAndColorToTextView(@IdRes int resourceId, String value,
             int color) {
+
         TextView textView = findViewById(resourceId);
         textView.setText(value);
+
+        if (defaultTextColors == null) {
+            defaultTextColors = textView.getTextColors();
+        }
+
         textView.setTextColor(color);
     }
 
