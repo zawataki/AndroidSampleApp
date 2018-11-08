@@ -109,7 +109,8 @@ public class NfcReaderActivity extends AppCompatActivity {
          * Cannot use org.apache.commons.codec.binary.Hex#encodeHexString(byte[])
          * because {@link NoSuchMethodError} occurs
          *
-         * @see <a href="https://qiita.com/komitake/items/375863848e2534d29a87">AndroidでApache Commons Codecを使う時の注意点 - Qiita</a>
+         * @see <a href="https://qiita.com/komitake/items/375863848e2534d29a87">
+         *     AndroidでApache Commons Codecを使う時の注意点 - Qiita</a>
          */
         final byte[] tagIdBytes = tag.getId();
         String tagIdStr = "";
@@ -122,23 +123,50 @@ public class NfcReaderActivity extends AppCompatActivity {
         final String username = getUsernameByTagId(tagIdStr);
         if (username == null) {
             Log.i("User is NOT registered for tag: " + tagIdStr);
-            setValueToTextView(R.id.textViewUserSearchResut,
-                    "You are not registered. Please register");
-            setValueToTextView(R.id.textViewUsername, "");
-            findViewById(R.id.editTextUsername).setVisibility(View.VISIBLE);
-            findViewById(R.id.buttonUserRegistration).setVisibility(
-                    View.VISIBLE);
+            setValueAndColorToTextView(R.id.textViewUserSearchResut,
+                    "You are NOT registered.\nPlease register", Color.BLUE);
+            showUsernameInputArea();
+        } else {
+            Log.i("User is already registered. username: " + username);
+            setValueToTextView(R.id.textViewUserSearchResut, "Hi " + username);
+        }
+    }
+
+    private void showUsernameInputArea() {
+        setUsernameInputAreaVisibility(true);
+    }
+
+    private void hideUsernameInputArea() {
+        setUsernameInputAreaVisibility(false);
+    }
+
+    private void setUsernameInputAreaVisibility(boolean visibility) {
+        setValueToTextView(R.id.editTextUsername, "");
+
+        final int layoutVisibility;
+        if (visibility) {
+            layoutVisibility = View.VISIBLE;
+
             InputMethodManager imm =
                     (InputMethodManager) getSystemService(
                             Context.INPUT_METHOD_SERVICE);
             imm.showSoftInput(findViewById(R.id.editTextUsername),
                     InputMethodManager.SHOW_IMPLICIT);
         } else {
-            Log.i("User is already registered. username: " + username);
-            setValueToTextView(R.id.textViewUserSearchResut, "Existing user");
-            setValueToTextView(R.id.textViewUsername, username);
+            layoutVisibility = View.INVISIBLE;
+
+            InputMethodManager imm =
+                    (InputMethodManager) getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(
+                    findViewById(R.id.editTextUsername).getWindowToken(), 0);
         }
+
+        findViewById(R.id.editTextUsername).setVisibility(layoutVisibility);
+        findViewById(R.id.buttonUserRegistration).setVisibility(
+                layoutVisibility);
     }
+
 
     private void setValueToTextView(@IdRes int resourceId, String value) {
         TextView textView = findViewById(resourceId);
@@ -172,30 +200,17 @@ public class NfcReaderActivity extends AppCompatActivity {
 
         if (StringUtils.isBlank(newUsername)) {
             setValueAndColorToTextView(R.id.textViewUserSearchResut,
-                    "Username is blank. Please input valid username",
+                    "Username must not be blank.\n" +
+                            "Please input valid username",
                     Color.RED);
-            setValueToTextView(R.id.editTextUsername, "");
-
-            InputMethodManager imm =
-                    (InputMethodManager) getSystemService(
-                            Context.INPUT_METHOD_SERVICE);
-            imm.showSoftInput(findViewById(R.id.editTextUsername),
-                    InputMethodManager.SHOW_IMPLICIT);
+            showUsernameInputArea();
             return;
         }
 
-        InputMethodManager imm =
-                (InputMethodManager) getSystemService(
-                        Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(
-                findViewById(R.id.editTextUsername).getWindowToken(), 0);
-
-        TextView textView = findViewById(R.id.textViewNfcId);
+        final TextView textView = findViewById(R.id.textViewNfcId);
         final String tagId = textView.getText().toString();
-        preferences.edit().putString(tagId, newUsername).apply();
-        setValueToTextView(R.id.editTextUsername, "");
-        findViewById(R.id.editTextUsername).setVisibility(View.INVISIBLE);
-        findViewById(R.id.buttonUserRegistration).setVisibility(View.INVISIBLE);
+        preferences.edit().putString(tagId, newUsername.trim()).apply();
+        hideUsernameInputArea();
         setValueToTextView(R.id.textViewUserSearchResut,
                 "Hi " + newUsername + ",\nThank you for registration");
         Log.i("User registration is successful. tagId: " + tagId +
