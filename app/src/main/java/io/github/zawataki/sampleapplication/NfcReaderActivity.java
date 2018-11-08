@@ -1,7 +1,10 @@
 package io.github.zawataki.sampleapplication;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -19,6 +22,7 @@ import android.nfc.tech.NfcF;
 import android.nfc.tech.NfcV;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -120,9 +124,11 @@ public class NfcReaderActivity extends AppCompatActivity {
                     "You are not registered. Please register");
             setValueToTextView(R.id.textViewUsername, "");
             findViewById(R.id.editTextUsername).setVisibility(View.VISIBLE);
-            findViewById(R.id.buttonUserRegistration).setVisibility(View.VISIBLE);
+            findViewById(R.id.buttonUserRegistration).setVisibility(
+                    View.VISIBLE);
             InputMethodManager imm =
-                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    (InputMethodManager) getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
             imm.showSoftInput(findViewById(R.id.editTextUsername),
                     InputMethodManager.SHOW_IMPLICIT);
         } else {
@@ -137,7 +143,8 @@ public class NfcReaderActivity extends AppCompatActivity {
         textView.setText(value);
     }
 
-    private void setValueAndColorToTextView(@IdRes int resourceId, String value, int color) {
+    private void setValueAndColorToTextView(@IdRes int resourceId, String value,
+            int color) {
         TextView textView = findViewById(resourceId);
         textView.setText(value);
         textView.setTextColor(color);
@@ -153,32 +160,43 @@ public class NfcReaderActivity extends AppCompatActivity {
 
         if (StringUtils.isBlank(newUsername)) {
             setValueAndColorToTextView(R.id.textViewUserSearchResut,
-                    "Username is blank. Please input valid username", Color.RED);
+                    "Username is blank. Please input valid username",
+                    Color.RED);
             setValueToTextView(R.id.editTextUsername, "");
 
             InputMethodManager imm =
-                    (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    (InputMethodManager) getSystemService(
+                            Context.INPUT_METHOD_SERVICE);
             imm.showSoftInput(findViewById(R.id.editTextUsername),
                     InputMethodManager.SHOW_IMPLICIT);
             return;
         }
 
         InputMethodManager imm =
-                (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(findViewById(R.id.editTextUsername).getWindowToken(), 0);
+                (InputMethodManager) getSystemService(
+                        Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(
+                findViewById(R.id.editTextUsername).getWindowToken(), 0);
 
         TextView textView = findViewById(R.id.textViewNfcId);
         final String tagId = textView.getText().toString();
-        preferences.edit().putString(tagId, newUsername).commit();
+        preferences.edit().putString(tagId, newUsername).apply();
         setValueToTextView(R.id.editTextUsername, "");
         findViewById(R.id.editTextUsername).setVisibility(View.INVISIBLE);
         findViewById(R.id.buttonUserRegistration).setVisibility(View.INVISIBLE);
         setValueToTextView(R.id.textViewUserSearchResut,
                 "Hi " + newUsername + ",\nThank you for registration");
-        Log.i("User registration is successful. tagId: " + tagId + ". username: " + newUsername);
+        Log.i("User registration is successful. tagId: " + tagId +
+                ". username: " + newUsername);
     }
 
-    public void deleteAllUsers(View view) {
+    public void confirmDeleteAllUsers(View view) {
+        final DeleteAllUsersDialogFragment deleteAllUsersDialogFragment =
+                new DeleteAllUsersDialogFragment();
+        deleteAllUsersDialogFragment.show(getSupportFragmentManager(), "");
+    }
+
+    private void deleteAllUsersReally() {
         preferences.edit().clear().commit();
     }
 
@@ -186,5 +204,32 @@ public class NfcReaderActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         nfcAdapter.disableForegroundDispatch(this);
+    }
+
+    public static class DeleteAllUsersDialogFragment extends DialogFragment {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+            return new AlertDialog.Builder(getActivity())
+                    .setMessage(R.string.confirm_delete_all_users)
+                    .setPositiveButton(R.string.delete,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,
+                                        int id) {
+                                    Log.i("Do deleting");
+                                    ((NfcReaderActivity) getActivity())
+                                            .deleteAllUsersReally();
+                                }
+                            })
+                    .setNegativeButton(R.string.cancel,
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog,
+                                        int id) {
+                                    Log.i("Cancel deleting");
+                                }
+                            })
+                    .create();
+        }
     }
 }

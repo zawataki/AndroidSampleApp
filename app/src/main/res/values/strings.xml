@@ -6,5 +6,8 @@
     <string name="title_nfc_reader">NFC Tag ID</string>
     <string name="title_username">Username</string>
     <string name="button_delete_all_users">Delete all users</string>
+    <string name="confirm_delete_all_users">Delete all users?</string>
     <string name="button_register_user">Register</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
 </resources>
