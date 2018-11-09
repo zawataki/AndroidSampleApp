@@ -224,7 +224,17 @@ public class NfcReaderActivity extends AppCompatActivity {
     }
 
     private void deleteAllUsersReally() {
+
         preferences.edit().clear().commit();
+
+        final SimpleDialogFragment simpleDialogFragment =
+                new SimpleDialogFragment();
+
+        final Bundle bundle = new Bundle();
+        bundle.putString(SimpleDialogFragment.ARGUMENT_KEY_MSG,
+                "All users have been deleted");
+        simpleDialogFragment.setArguments(bundle);
+        simpleDialogFragment.show(getSupportFragmentManager(), "");
     }
 
     @Override
@@ -256,6 +266,20 @@ public class NfcReaderActivity extends AppCompatActivity {
                                     Log.i("Cancel deleting");
                                 }
                             })
+                    .create();
+        }
+    }
+
+    public static class SimpleDialogFragment extends DialogFragment {
+
+        public static String ARGUMENT_KEY_MSG = "msg";
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+
+            return new AlertDialog.Builder(getActivity())
+                    .setMessage(getArguments().getString(ARGUMENT_KEY_MSG))
+                    .setPositiveButton(R.string.ok, null)
                     .create();
         }
     }
