@@ -19,6 +19,11 @@ android {
     }
 }
 
+deploygate {
+    userName = "$System.env.DEPLOYGATE_USER"
+    token = "$System.env.DEPLOYGATE_TOKEN"
+}
+
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:28.0.0'
