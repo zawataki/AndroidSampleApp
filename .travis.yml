@@ -1,10 +1,16 @@
 language: android
+android:
+  components:
+    licenses:
+    - android-sdk-preview-license-.+
+    - android-sdk-license-.+
+    - google-gdk-license-.+
+
 env:
   global:
   - DEPLOYGATE_USER=zawataki
   - secure: "qTyXGvjuqQDx2U5T1LrG6//hkTvmYf2SsGPmrv6/+89euMogbZvyVM1ZaGCPSPIPaYzGl8CopPWRJpvYRrTCsQAQRQzl0mspoLq5JnRa1Tg7tBzWyU3tzgp/L5BGqn780dh1Wupm1I0B35KMWQJsGFS3sUHdWEmiAwrZ8kdqxEN1frGjfcmPLCGTNggzTkIbnoP75goeiXKkf1idflmgP3l7wp4688AFzQXGk50oGlNjrinpEK73JCgE3CI+Q6nRGkR6eu4ssATQRtFVkSeCOxmA09312Z/yCli+NfjiGZY6/Wo5nN/d2XLL7xdIlAHKICbCru5HCbau60eKGnPya2gxH0bpEXrbsONDS0sXSVCXkMdvOJkgBkJMcrXQbRrlTFW+dNUCOslzwhbg/rmmTB6X/LIHlOhIrbZUnuLk1BAInyAhXSSP5hN7Y65pp0y4vI47voDv9byS/q8wribHSJCZzQnJ+0Km9ob/NikUkhLHhEg/fDWnLQcB3xT2khiChwK+3ujt3bma35EwYKNzH4pRQ4zv6MqJg9rW+GsbHeThM6X1lCsgx2GxkpzRRnPPX/JgHFMfcra++5aBT+4uDWzg12sQh3un77kMOzSFVbbVIo4Sz9QUPICHr0cclviBzZMdDqoA3iBo3VucPWGmEqtg9TJGMcggBaY6cPVLkMU="
 
 script:
-  - yes | sdkmanager --licenses
   - ./gradlew uploadDeployGateDebug
 
