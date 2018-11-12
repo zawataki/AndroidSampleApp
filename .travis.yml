@@ -13,10 +13,5 @@ android:
     - android-sdk-license-.+
     - google-gdk-license-.+
 
-env:
-  global:
-    - DEPLOYGATE_USER=zawataki
-    - secure: "QRSw44rAJ3uMvC9qIZDf/O//ivDxo+chRBwfGSFAsu8xIhfbwyleS33JeijTZ4CDcF6jliHZQPZyQrFACcZTlgn3nYNSqq9Q/Ge/115nkXCmWEuqkua8Z77kx7z1ufRrqQxkJIa+imIlZ57/wa9SRuREtLmiLnGy38vOqPuMB4pEIa90W5eHnWs+ftop/EZc9Yfsko7LcsoM89wzl8lIr6xXV8sfqexVXBZ++6Ex+SFxgIeKynuYXWRa7xW9C36ixKMeoeWkEXyLNBSG07XQC4ngiCx+hVUxLBKw2H5Ny8qRtIWqhWYPY63CNu69+IwN7OoST2j+QJ1J22C0HsLhoqQi3dfpxtYr6wykTPDvoQ/4R+2wPwEzw8he772A0KuRDmYQkmYJZBXvLncc3v4yEhoqYP8iAMwkqeB8zsitPTUFz984rhVyk03BxlwNiaPjqu5FkklPhXVzHoR/nZnMmcyVMIFhQfKrSzjOdfVdx69jaTeF4GrBqk8vSHfhI5edaNF6gSwWTncIpwuDllH3D2293lF3eJqDiBNxS9RdS2oAw+qdOnl1fj2MIvbzo5Kibhz+va3KuSXpwTdvo96ecEqkeGawHho6o7UkdY7jCeZV3aLpGU+E58MYkBL9XEu+DgZUpy4mdtzJ4TGu8CYTS9PBtEPKiyhva3bPd4dMe88="
-
 script:
-  - ./gradlew :app:uploadDeployGateDebug
+  - ./gradlew build
